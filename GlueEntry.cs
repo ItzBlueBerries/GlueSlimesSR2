@@ -91,6 +91,9 @@ namespace GlueSlimes
                         };
                         glueDefinition.Diet.RefreshEatMap(SRSingleton<GameContext>.Instance.SlimeDefinitions, glueDefinition);
 
+                        glueDefinition.properties = UnityEngine.Object.Instantiate(Utility.Get<SlimeDefinition>("Pink").properties);
+                        glueDefinition.defaultPropertyValues = UnityEngine.Object.Instantiate(Utility.Get<SlimeDefinition>("Pink")).defaultPropertyValues;
+
                         SlimeAppearance slimeAppearance = UnityEngine.Object.Instantiate(Utility.Get<SlimeAppearance>("PuddleDefault"));
                         SlimeAppearanceApplicator slimeAppearanceApplicator = glueDefinition.prefab.GetComponent<SlimeAppearanceApplicator>();
                         slimeAppearance.name = "GlueDefault";

@@ -8,7 +8,7 @@ using GlueSlimes;
 using MelonLoader;
 
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: MelonInfo(typeof(GlueEntry), "Glue Slimes", "1.1", "FruitsyOG", null)]
+[assembly: MelonInfo(typeof(GlueEntry), "Glue Slimes", "1.1.1", "FruitsyOG", null)]
 [assembly: MelonGame("MonomiPark", "SlimeRancher2")]
 [assembly: AssemblyTitle("GlueSlimes")]
 [assembly: AssemblyDescription("")]
