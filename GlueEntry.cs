@@ -27,8 +27,10 @@ namespace GlueSlimes
             gluePlortType.hideFlags |= HideFlags.HideAndDontSave;
             glueDefinition.name = "Glue";
             glueDefinition.color = Color.white;
+            glueDefinition.localizationSuffix = "glue_slime";
             gluePlortType.name = "GluePlort";
             gluePlortType.color = Color.white;
+            gluePlortType.localizationSuffix = "glue_plort";
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -91,6 +93,7 @@ namespace GlueSlimes
                         };
                         glueDefinition.Diet.RefreshEatMap(SRSingleton<GameContext>.Instance.SlimeDefinitions, glueDefinition);
 
+                        glueDefinition.icon = Utility.CreateSprite(Utility.LoadImage("Assets.glue_slime_ico"));
                         glueDefinition.properties = UnityEngine.Object.Instantiate(Utility.Get<SlimeDefinition>("Pink").properties);
                         glueDefinition.defaultPropertyValues = UnityEngine.Object.Instantiate(Utility.Get<SlimeDefinition>("Pink")).defaultPropertyValues;
 
@@ -146,7 +149,7 @@ namespace GlueSlimes
                         SRSingleton<SceneContext>.Instance.SlimeAppearanceDirector.RegisterDependentAppearances(Utility.Get<SlimeDefinition>("Glue"), Utility.Get<SlimeDefinition>("Glue").AppearancesDefault[0]);
                         SRSingleton<SceneContext>.Instance.SlimeAppearanceDirector.UpdateChosenSlimeAppearance(Utility.Get<SlimeDefinition>("Glue"), Utility.Get<SlimeDefinition>("Glue").AppearancesDefault[0]);
                         SRSingleton<GameContext>.Instance.SlimeDefinitions.Slimes = SRSingleton<GameContext>.Instance.SlimeDefinitions.Slimes.AddItem(glueDefinition).ToArray();
-                        SRSingleton<GameContext>.Instance.SlimeDefinitions.slimeDefinitionsByIdentifiable.Add(glueDefinition, glueDefinition);
+                        SRSingleton<GameContext>.Instance.SlimeDefinitions.slimeDefinitionsByIdentifiable.TryAdd(glueDefinition, glueDefinition);
                         break;
                     }
             }

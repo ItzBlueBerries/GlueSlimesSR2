@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Il2Cpp;
+using Il2CppMonomiPark.SlimeRancher.DataModel;
+using Il2CppMonomiPark.SlimeRancher;
 using Il2CppMonomiPark.SlimeRancher.Script.Util;
 using Il2CppMonomiPark.SlimeRancher.UI;
 using Il2CppMonomiPark.SlimeRancher.UI.Localization;
-using Il2CppSystem.Collections.Generic;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -38,15 +39,6 @@ namespace GlueSlimes
             }
         }
 
-        [HarmonyPatch(typeof(AnalyticsUtil), "ReportPerIdentifiableData")]
-        public static class PatchAnalyticsUtilReportPerIdentifiableData
-        {
-            public static bool Prefix(System.Collections.Generic.IEnumerable<IdentifiableType> ids)
-            {
-                return false;
-            }
-        }
-
         [HarmonyPatch(typeof(AutoSaveDirector), "Awake")]
         public static class PatchAutoSaveDirectorAwake
         {
@@ -58,6 +50,46 @@ namespace GlueSlimes
                 Utility.Get<IdentifiableTypeGroup>("SlimesGroup").memberTypes.Add(GlueEntry.glueDefinition);
                 __instance.identifiableTypes.memberTypes.Add(GlueEntry.gluePlortType);
                 __instance.identifiableTypes.memberTypes.Add(GlueEntry.glueDefinition);
+            }
+        }
+
+        [HarmonyPatch(typeof(SavedGame))]
+        internal static class SavedGamePushPatch
+        {
+            [HarmonyPrefix]
+            [HarmonyPatch(nameof(SavedGame.Push), typeof(GameModel))]
+            public static void PushGameModel(SavedGame __instance)
+            {
+                foreach (PediaEntry pediaEntry in Utility.Pedia.addedPedias)
+                {
+                    if (!__instance.pediaEntryLookup.ContainsKey(pediaEntry.GetPersistenceId()))
+                        __instance.pediaEntryLookup.Add(pediaEntry.GetPersistenceId(), pediaEntry);
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(PediaDirector), "Awake")]
+        internal static class PatchPediaDirectorAwake
+        {
+            public static void Prefix(PediaDirector __instance)
+            {
+                #region PEDIAS
+                Utility.Pedia.AddSlimepedia(Utility.Get<IdentifiableType>("Glue"), "Glue",
+                    "Gooey, Hungry, Vegetarian Slime?",
+                    "Glue Slimes are your gooey little friends! They're made out of glue entirely, along with some slimey substance. They do get hungry to the point they may or may not eat something they shouldn't. <s>Tarrs also dislike their gluey taste and will not eat them.<s>",
+                    "There are no dangerous risk! Glue Slimes are usually friendly, but.. if they have no other food source, they may result to eating Pink Slimes. They're common so its easy for them to gobble on with no veggies around, so keep them away from your pink slimes if you must!",
+                    "Their plorts are made out of glue as well, great for gluing things together.. that's for sure!"
+                );
+
+                Utility.Pedia.AddSlimepediaPage("Glue", 2, "They may or may not have a relation to other <b>liquid formed slimes<b>.");
+                #endregion
+
+                foreach (var pediaEntry in Utility.Pedia.addedPedias)
+                {
+                    var identPediaEntry = pediaEntry.TryCast<IdentifiablePediaEntry>();
+                    if (identPediaEntry && !__instance.identDict.ContainsKey(identPediaEntry.identifiableType))
+                        __instance.identDict.Add(identPediaEntry.identifiableType, pediaEntry);
+                }
             }
         }
 
@@ -94,7 +126,7 @@ namespace GlueSlimes
                     dictionary = new System.Collections.Generic.Dictionary<string, string>(); ;
                     addedTranslations.Add(table, dictionary);
                 }
-                dictionary.Add(key, localized);
+                dictionary.TryAdd(key, localized);
                 StringTable table2 = LocalizationUtil.GetTable(table);
                 StringTableEntry stringTableEntry = table2.AddEntry(key, localized);
                 return new LocalizedString(table2.SharedData.TableCollectionName, stringTableEntry.SharedEntry.Id);
